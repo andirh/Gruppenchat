@@ -8,9 +8,14 @@ const userNames = document.getElementById('users');
 
 const username = Qs.parse(location.search, {
     ignoreQueryPrefix: true
-})
+});
 
-const socket = io();
+const ipAdress = Qs.parse(location.search, {
+    ignoreQueryPrefix: true
+}).ipAdress;
+console.log(ipAdress);
+
+let socket = io("ws://" + ipAdress +":3000");
 
 socket.emit('joinRoom',  username);
 
