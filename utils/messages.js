@@ -9,4 +9,4 @@ function formatMessage(username, text){
 }
 
 
-module.export = formatMessage;
+module.exports = {formatMessage};

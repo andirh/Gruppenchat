@@ -2,7 +2,8 @@ const path = require('path');
 const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
-const formatMessage = require('./utils/messages');
+const messages = require('./utils/messages.js');
+const users = require('./utils/users.js');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,25 +16,43 @@ app.use(express.static(path.join(__dirname,'public')));
 //Run when Client connects
 io.on('connection', socket => {
 
-    //nur an speziellen Client
-    socket.emit('message', formatMessage(botName, 'Wilkommen im Gruppenchat' ));
+    socket.on('joinRoom', (username) =>{
 
-    //an alle außer speziellen Client
-    socket.broadcast.emit('message', 'Ein Nutzer ist dem Gruppenchat beigetreten');
+        const user = users.userJoin(socket.id, username.username);
+
+        //nur an speziellen Client
+        socket.emit('message', messages.formatMessage(botName, 'Wilkommen im Gruppenchat' ));
+
+        //an alle außer speziellen Client
+        console.log(user);
+        socket.broadcast.emit('message', messages.formatMessage(botName, `${user.username} ist dem Gruppenchat beigetreten`));
+
+    //Nutzer senden
+    io.emit('users', users.getUsers());
+
+    });
+
 
     //an alle
     //io.emit()
 
-    //Wenn Client Verbindung trennt
-    socket.on('disconnect', () => {
-        io.emit('message', 'Ein Nutzer hat den Gruppenchat verlassen');
+    //Auf chatMessage warten
+    socket.on('chatMessage', (msg) => {
+        const user = users.getCurrentUser(socket.id);
+       io.emit('message', messages.formatMessage(user.username, msg));
     })
 
+    //Wenn Client Verbindung trennt
+    socket.on('disconnect', () => {
+        const user = users.userLeave(socket.id);
+    if(user){
+        io.emit('message', messages.formatMessage(botName, `${user.username} hat den Gruppenchat verlassen`));
+    }
+    //Nutzer senden
+    io.emit('users', users.getUsers());
 
-//Auf chatMessage warten
-socket.on('chatMessage', (msg) => {
-    io.emit('message', 'USER', msg);
-})
+       
+    })
 
 });
 
