@@ -7,7 +7,9 @@ const users = require('./utils/users.js');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*'
+}));
 const server = http.createServer(app);
 const io = socketio(server);
 const botName = 'Admin Bot';
