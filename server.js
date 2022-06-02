@@ -4,8 +4,10 @@ const express = require('express');
 const socketio = require('socket.io');
 const messages = require('./utils/messages.js');
 const users = require('./utils/users.js');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const io = socketio(server);
 const botName = 'Admin Bot';
