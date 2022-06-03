@@ -7,15 +7,17 @@ const users = require('./utils/users.js');
 const cors = require('cors');
 
 const app = express();
-app.use(cors({
-    origin: '*'
-}));
+
+app.use(cors());
+
 const server = http.createServer(app);
 const io = socketio(server);
 const botName = 'Admin Bot';
 
 //Set static folder
 app.use(express.static(path.join(__dirname,'public')));
+
+app.use(function(req,res,next){     res.header("Access-Control-Allow-Origin", "*");     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, PATCH");     res.header("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, X-Requested-With");          next();   });
 
 //Run when Client connects
 io.on('connection', socket => {
